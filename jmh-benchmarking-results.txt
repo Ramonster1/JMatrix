@@ -1,0 +1,20 @@
+Benchmark                                         Mode  Cnt    Score    Error  Units
+MatrixBenchmarks.measureCombine                  thrpt    4   77.833 ±  7.494  ops/s
+MatrixBenchmarks.measureForkAndJoinCombine_1000  thrpt    4  235.267 ± 25.524  ops/s
+MatrixBenchmarks.measureForkAndJoinCombine_5000  thrpt    4  234.064 ± 57.376  ops/s
+MatrixBenchmarks.measureParallelCombine          thrpt    4  236.961 ± 54.985  ops/s
+
+MatrixBenchmarks.measureDot                      thrpt    4   31.898 ±  1.250  ops/s
+MatrixBenchmarks.measureForkJoinDot_1000         thrpt    4  125.740 ± 13.391  ops/s
+MatrixBenchmarks.measureForkJoinDot_5000         thrpt    4  127.440 ±  3.996  ops/s
+MatrixBenchmarks.measureParallelDot              thrpt    4  122.639 ± 20.317  ops/s
+
+MatrixBenchmarks.measureCombine                   avgt    4    0.010 ±  0.002   s/op
+MatrixBenchmarks.measureForkAndJoinCombine_1000   avgt    4    0.004 ±  0.001   s/op
+MatrixBenchmarks.measureForkAndJoinCombine_5000   avgt    4    0.004 ±  0.001   s/op
+MatrixBenchmarks.measureParallelCombine           avgt    4    0.009 ±  0.064   s/op
+
+MatrixBenchmarks.measureDot                       avgt    4    0.024 ±  0.014   s/op
+MatrixBenchmarks.measureForkJoinDot_1000          avgt    4    0.008 ±  0.001   s/op
+MatrixBenchmarks.measureForkJoinDot_5000          avgt    4    0.008 ±  0.001   s/op
+MatrixBenchmarks.measureParallelDot               avgt    4    0.026 ±  0.163   s/op

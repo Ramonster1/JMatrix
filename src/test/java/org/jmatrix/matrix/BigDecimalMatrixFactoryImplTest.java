@@ -1,11 +1,9 @@
 package org.jmatrix.matrix;
 
-import org.jmatrix.matrix.dot.BigDecimalDotFunctions;
 import org.jmatrix.matrix.exception.EmptyMatrixException;
 import org.jmatrix.matrix.exception.ListsIncompatibleForMatrixException;
 import org.jmatrix.matrix.matrix.Matrix;
-import org.jmatrix.matrix.matrixFactory.BigDecimalMatrixFactoryImpl;
-import org.jmatrix.matrix.matrixFactory.MatrixFactory;
+import org.jmatrix.matrix.matrixFactory.BigDecimalMatrixFactory;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -14,15 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BigDecimalMatrixFactoryImplTest {
 
-	private final MatrixFactory<BigDecimal> matrixFactory = new BigDecimalMatrixFactoryImpl(BigDecimalDotFunctions.getInstance());
-
 	@Test
 	void testCreatingMatrixWithRandomValues() throws ListsIncompatibleForMatrixException, EmptyMatrixException {
 		int rows = 50;
 		int cols = 70;
 		BigDecimal minRange = BigDecimal.valueOf(-0.5);
 		BigDecimal maxRange = BigDecimal.valueOf(0.5);
-		Matrix<BigDecimal> matrix = matrixFactory.withRandomValues(rows, cols, minRange, maxRange);
+		Matrix<BigDecimal> matrix = BigDecimalMatrixFactory.withRandomValues(rows, cols, minRange, maxRange);
 
 		assertEquals(rows, matrix.getMatrixLists().size());
 		assertTrue(matrix.getMatrixLists().stream().allMatch(list -> list.size() == cols),
