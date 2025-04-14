@@ -1,10 +1,7 @@
 package org.jmatrix.matrix;
 
-import org.jmatrix.matrix.dot.BigDecimalDotFunctions;
-import org.jmatrix.matrix.dot.IntegerDotFunctions;
 import org.jmatrix.matrix.exception.EmptyMatrixException;
 import org.jmatrix.matrix.exception.ListsIncompatibleForMatrixException;
-import org.jmatrix.matrix.exception.MatricesIncompatibleForOperationException;
 import org.jmatrix.matrix.matrix.Matrix;
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +15,10 @@ public class MatrixTest {
 
 	@Test
 	void testRandomValueConstructor() {
-		var matrix = new Matrix<>(BigDecimalDotFunctions.getInstance(),
-				10, 15, BigDecimal.valueOf(0.03), BigDecimal.valueOf(0.07),
+		var matrix = new Matrix<>(10,
+				15,
+				BigDecimal.valueOf(0.03),
+				BigDecimal.valueOf(0.07),
 				(min, max) -> min.add(BigDecimal.valueOf(Math.random()).multiply(max.subtract(min))));
 
 		assertEquals(10, matrix.getRows());
@@ -41,7 +40,7 @@ public class MatrixTest {
 		var row2 = List.of(BigDecimal.valueOf(9), BigDecimal.valueOf(10));
 		var row3 = List.of(BigDecimal.valueOf(11), BigDecimal.valueOf(12));
 
-		var matrix = new Matrix<>(BigDecimalDotFunctions.getInstance(), List.of(row1, row2, row3));
+		var matrix = new Matrix<>(List.of(row1, row2, row3));
 		assertEquals(row1, matrix.getMatrixLists().getFirst());
 		assertEquals(row2, matrix.getMatrixLists().get(1));
 		assertEquals(row3, matrix.getMatrixLists().getLast());
@@ -54,127 +53,81 @@ public class MatrixTest {
 		emptyAndNullList.add(List.of());
 		emptyAndNullList.add(null);
 
-		assertThrows(EmptyMatrixException.class, () -> new Matrix<>(BigDecimalDotFunctions.getInstance(), emptyAndNullList));
-	}
-
-	@Test
-	void testComputeDotWhenMatricesAreUnmultipliable() throws ListsIncompatibleForMatrixException, EmptyMatrixException {
-		var matrix1 = new Matrix<>(BigDecimalDotFunctions.getInstance(), List.of(
-				List.of(BigDecimal.valueOf(7), BigDecimal.valueOf(8)),
-				List.of(BigDecimal.valueOf(9), BigDecimal.valueOf(10)),
-				List.of(BigDecimal.valueOf(11), BigDecimal.valueOf(12))));
-
-		var matrix2 = new Matrix<>(BigDecimalDotFunctions.getInstance(), List.of(
-				List.of(BigDecimal.valueOf(7), BigDecimal.valueOf(8)),
-				List.of(BigDecimal.valueOf(10), BigDecimal.valueOf(12)),
-				List.of(BigDecimal.valueOf(14), BigDecimal.valueOf(16))));
-
-		MatricesIncompatibleForOperationException exception1 = assertThrows(MatricesIncompatibleForOperationException.class, () -> matrix1.dot(matrix2));
-		MatricesIncompatibleForOperationException exception2 = assertThrows(MatricesIncompatibleForOperationException.class, () -> matrix2.dot(matrix1));
-
-		String expectedMessage = "Cannot create dot product for matrices. Matrices are incompatible for multiplication.";
-		assertEquals(expectedMessage, exception1.getMessage());
-		assertEquals(expectedMessage, exception2.getMessage());
-	}
-
-	@Test
-	void testMatricesIncompatibleForOperationExceptionThrown_WhenMatricesAreIncompatible() throws ListsIncompatibleForMatrixException, EmptyMatrixException {
-		var matrix1 = new Matrix<>(BigDecimalDotFunctions.getInstance(), List.of(
-				List.of(BigDecimal.valueOf(7), BigDecimal.valueOf(8)),
-				List.of(BigDecimal.valueOf(9), BigDecimal.valueOf(10)),
-				List.of(BigDecimal.valueOf(11), BigDecimal.valueOf(12))));
-
-		var matrix2 = new Matrix<>(BigDecimalDotFunctions.getInstance(), List.of(
-				List.of(BigDecimal.valueOf(7), BigDecimal.valueOf(8)),
-				List.of(BigDecimal.valueOf(14), BigDecimal.valueOf(16))));
-
-		MatricesIncompatibleForOperationException e =
-				assertThrows(MatricesIncompatibleForOperationException.class, () -> {
-					matrix1.combine(matrix2, BigDecimal::add);
-				});
-
-		assertEquals("Cannot apply combine function with other matrix. Columns and rows do not match.",
-				e.getMessage());
-	}
-
-	@Test
-	void testResultsWhenApplyingFunctionToAllValuesInMatrix() throws EmptyMatrixException, ListsIncompatibleForMatrixException {
-		Matrix<Integer> matrix = new Matrix<>(IntegerDotFunctions.getInstance(), List.of(
-				List.of(6, 1),
-				List.of(4, -9),
-				List.of(24, 8)
-		));
-
-		Matrix<Integer> expectedMatrix = new Matrix<>(IntegerDotFunctions.getInstance(), List.of(
-				List.of(18, 3),
-				List.of(12, -27),
-				List.of(72, 24)
-		));
-
-		Matrix<Integer> resultMatrix = matrix.transform(x -> x * 3);
-
-		assertEquals(expectedMatrix.getRows(), resultMatrix.getRows(), "Matrix rows should be equal");
-		assertEquals(expectedMatrix.getColumns(), resultMatrix.getColumns(), "Matrix rows should be equal");
-
-		int colCount = resultMatrix.getColumns();
-
-		for (var rowIterator = 0; rowIterator < resultMatrix.getRows(); rowIterator++) {
-			for (var i = 0; i < colCount; i++) {
-				assertEquals(expectedMatrix.getMatrixLists().get(rowIterator).get(i), resultMatrix.getMatrixLists().get(rowIterator).get(i));
-			}
-		}
-	}
-
-	@Test
-	void testMatrixTransposition() throws EmptyMatrixException, ListsIncompatibleForMatrixException {
-		Matrix<Integer> matrix = new Matrix<>(IntegerDotFunctions.getInstance(), List.of(
-				List.of(6, 4, 24),
-				List.of(1, -9, 8)
-		));
-
-		Matrix<Integer> expectedMatrix = new Matrix<>(IntegerDotFunctions.getInstance(), List.of(
-				List.of(6, 1),
-				List.of(4, -9),
-				List.of(24, 8)
-		));
-
-		Matrix<Integer> resultMatrix = matrix.transpose();
-
-		assertEquals(resultMatrix.getMatrixLists().getFirst(), expectedMatrix.getMatrixLists().getFirst());
-		assertEquals(resultMatrix.getMatrixLists().get(1), expectedMatrix.getMatrixLists().get(1));
-		assertEquals(resultMatrix.getMatrixLists().get(2), expectedMatrix.getMatrixLists().get(2));
-	}
-
-	@Test
-	void testIsConditionTrueForEachElement() throws EmptyMatrixException, ListsIncompatibleForMatrixException {
-		var matrix = new Matrix<>(IntegerDotFunctions.getInstance(), List.of(
-				List.of(26, 68),
-				List.of(74, 26),
-				List.of(50, 36)));
-
-		assertTrue(matrix.isConditionTrueForEachElement(x -> x > 25 && x < 75));
-		assertFalse(matrix.isConditionTrueForEachElement(x -> x > 30 && x < 70));
+		assertThrows(EmptyMatrixException.class, () -> new Matrix<>(emptyAndNullList));
 	}
 
 	@Test
 	void testEquals() throws ListsIncompatibleForMatrixException, EmptyMatrixException {
-		var matrix1 = new Matrix<>(BigDecimalDotFunctions.getInstance(), List.of(
+		var matrix1 = new Matrix<>(List.of(
 				List.of(BigDecimal.ONE, BigDecimal.valueOf(2), BigDecimal.valueOf(3)),
 				List.of(BigDecimal.valueOf(4), BigDecimal.valueOf(5), BigDecimal.valueOf(6))
 		));
 
-		var matrix2 = new Matrix<>(BigDecimalDotFunctions.getInstance(), (List.of(
+		var matrix2 = new Matrix<>((List.of(
 				List.of(BigDecimal.valueOf(7), BigDecimal.valueOf(8)),
 				List.of(BigDecimal.valueOf(9), BigDecimal.valueOf(10)),
 				List.of(BigDecimal.valueOf(11), BigDecimal.valueOf(12))
 		)));
 
-		var matrix3 = new Matrix<>(BigDecimalDotFunctions.getInstance(), List.of(
+		var matrix3 = new Matrix<>(List.of(
 				List.of(BigDecimal.ONE, BigDecimal.valueOf(2), BigDecimal.valueOf(3)),
 				List.of(BigDecimal.valueOf(4), BigDecimal.valueOf(5), BigDecimal.valueOf(6))
 		));
 
 		assertNotEquals(matrix1, matrix2);
 		assertEquals(matrix1, matrix3);
+	}
+
+	@Test
+	void testAppendMatrix() {
+		var matrix1 = new Matrix<>(List.of(
+				List.of(BigDecimal.valueOf(1), BigDecimal.valueOf(2)),
+				List.of(BigDecimal.valueOf(3), BigDecimal.valueOf(4))
+		));
+
+		var matrix2 = new Matrix<>(List.of(
+				List.of(BigDecimal.valueOf(5), BigDecimal.valueOf(6)),
+				List.of(BigDecimal.valueOf(7), BigDecimal.valueOf(8))
+		));
+
+		var matrix3 = new Matrix<>(List.of(
+				List.of(BigDecimal.valueOf(9), BigDecimal.valueOf(10))
+		));
+
+		matrix1.appendMatrix(matrix2);
+		matrix1.appendMatrix(matrix3);
+
+		assertEquals(5, matrix1.getRows(), "Row count should reflect the appended matrix's row count");
+		assertEquals(2, matrix1.getColumns(), "Column count should remain unchanged");
+		List<List<BigDecimal>> expectedMatrix = List.of(
+				List.of(BigDecimal.valueOf(1), BigDecimal.valueOf(2)),
+				List.of(BigDecimal.valueOf(3), BigDecimal.valueOf(4)),
+				List.of(BigDecimal.valueOf(5), BigDecimal.valueOf(6)),
+				List.of(BigDecimal.valueOf(7), BigDecimal.valueOf(8)),
+				List.of(BigDecimal.valueOf(9), BigDecimal.valueOf(10))
+		);
+		assertEquals(expectedMatrix, matrix1.getMatrixLists(), "Matrix contents do not match after append");
+	}
+
+	@Test
+	void testCreatingEmptyMatrixThrowsException() {
+		assertThrows(EmptyMatrixException.class, () -> new Matrix<BigDecimal>(List.of()),
+				"Creating an empty matrix should throw exception");
+	}
+
+	@Test
+	void testAppendMatrixDifferentColumnSizesThrowsException() {
+		var matrix1 = new Matrix<>(List.of(
+				List.of(BigDecimal.valueOf(1), BigDecimal.valueOf(2)),
+				List.of(BigDecimal.valueOf(3), BigDecimal.valueOf(4))
+		));
+
+		var matrix2 = new Matrix<>(List.of(
+				List.of(BigDecimal.valueOf(5)),
+				List.of(BigDecimal.valueOf(6))
+		));
+
+		assertThrows(ListsIncompatibleForMatrixException.class, () -> matrix1.appendMatrix(matrix2),
+				"Appending a matrix with different column size should throw exception");
 	}
 }
