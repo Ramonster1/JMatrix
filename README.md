@@ -127,7 +127,7 @@ This project is licensed under the [MIT License](LICENSE). Feel free to use, mod
 
 ## Contributors
 
-- **[Your Name]**
+- **Ramon Singh**
 - Contributions are welcome! Open an issue or submit a pull request.
 
 ---
