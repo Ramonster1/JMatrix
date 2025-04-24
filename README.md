@@ -2,15 +2,18 @@
 
 Welcome to the **JMatrix**. This Java project provides the required functionality for performing machine learning calculations using matrices such as calculating the dot product of matrices, transposition, applying a function to combine two matrices etc.
 
-The library uses **generic** classes to allow extending the library with minimal additional code required. Although primitive matrix calculations could offer better performance than using Object classes such as BigDecimal, Object classes can offer better precision.
+The library uses generic classes to allow for easy extension with minimal additional code. While primitive types and arrays generally provide better performance for matrix calculations—both in terms of latency and memory usage—object classes like BigDecimal can offer superior precision (e.g., BigDouble versus double). Additionally, using objects and lists with generics opens up possibilities for leveraging high-performance arithmetic libraries or developing a new low/no-GC arithmetic library using memory-mapped files, bridging the gap between performance and high-precision.
 
-The goal of JMatrix is to provide a high-performance matrix library required for machine-learning. The current implementation of JMatrix provides a good foundation for further performance improvements. The current implementation offers flexible multithreading support for CPU intensive tasks such as calculation the dot product of matrices, and applying a function on two matrices with same dimensions, such as addition and subtraction. Based on JMH benchmarking tests, this improves the performance of calculating
+The goal of JMatrix is to provide a high-performance matrix library required for machine-learning. The current implementation of JMatrix provides a good foundation for further performance improvements. The current implementation offers flexible multithreading support for CPU intensive tasks such as calculating the dot product of two matrices, and applying a combine function on two matrices with same dimensions, such as addition and subtraction. Based on JMH benchmarking tests, this improves the performance of calculating
 - the dot product by roughly 400%
 - applying a combine function by roughly 300%
 
 However, there's potential for more performance improvements such as:
+- defining the capacity of ArrayLists when filling a Matrix
 - using distributed computing (perhaps using Aeron cluster), particularly beneficial when using large datasets often used in machine learning
+- bytecode analysis for compiler improvements, such as keeping method bytecode under 35 bytes to improve C1 inlining optimisations
 - using a high-performance arithmetic library such as [Apfloat](https://www.apfloat.org/apfloat_java/) (number implementation classes such as BigDecimal are quite poor on GC performance since they're immutable, this is a big bottleneck in performance)
+- investigate whether using memory-mapped files could be used effectively to store large matrices to reduce the GC overhead
 
 This library is largely based on the Python code to make a neural network in the book [Make your own Neural Network by Tariq Rashid](https://howtolearnmachinelearning.com/books/machine-learning-books/make-your-own-neural-network/) which uses the Python numpy library for performing matrix calculations.
 
@@ -112,10 +115,11 @@ For enhanced performance, `parallelDot` enables multithreaded computation:
 
 ## Future Improvements
 
+- Reduce latency of list calculations, e.g. set ArrayList capacity to prevent the underlying array from resizing
 - Improve GC performance, immutable classes like BigDecimal aren't great for GC.
 - Use distributed computing to use divide-and-conquer.
 - Support custom thread pool management for improved multithreading control.
-- More unit & benchmark tests. May remove fork/join implementations if they don't provide performance benefits since it requires more thought for the user to select an appropriate threshold value.
+- More unit & benchmark tests. May remove fork/join implementations if they don't provide performance benefits since it requires more thought for the user to select an appropriate threshold value, or alternatively auto-generate a threshold value, similarly to parallel stream methods.
 
 ---
 
