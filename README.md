@@ -8,14 +8,21 @@ The goal of JMatrix is to provide a high-performance matrix library required for
 - the dot product by roughly 400%
 - applying a combine function by roughly 300%
 
-However, there's potential for more performance improvements such as:
-- defining the capacity of ArrayLists when filling a Matrix
-- using distributed computing (perhaps using Aeron cluster), particularly beneficial when using large datasets often used in machine learning
-- bytecode analysis for compiler improvements, such as keeping method bytecode under 35 bytes to improve C1 inlining optimisations
-- using a high-performance arithmetic library such as [Apfloat](https://www.apfloat.org/apfloat_java/) (number implementation classes such as BigDecimal are quite poor on GC performance since they're immutable, this is a big bottleneck in performance)
-- investigate whether using memory-mapped files could be used effectively to store large matrices to reduce the GC overhead
-
+However, there's potential for more performance improvements, as discussed below.
 This library is largely based on the Python code to make a neural network in the book [Make your own Neural Network by Tariq Rashid](https://howtolearnmachinelearning.com/books/machine-learning-books/make-your-own-neural-network/) which uses the Python numpy library for performing matrix calculations.
+
+---
+
+## Planned improvements/Roadmap towards low-latency
+
+Roadmap towards low-latency is:
+- Reduce latency of list calculations, e.g. set ArrayList capacity to prevent the underlying array from resizing.
+- Use distributed computing (perhaps using Aeron cluster), to take a divide-and-conquer approach. Particularly beneficial when using large datasets often used in machine learning.
+- Bytecode analysis for compiler improvements, such as keeping method bytecode under 35 bytes to improve C1 inlining optimisations
+- Use a high-performance arithmetic library such as [Apfloat](https://www.apfloat.org/apfloat_java/) (number implementation classes such as BigDecimal are quite poor on GC performance since they're immutable, this is a big bottleneck in performance), or create a new low/no-GC high-precision low-latency arithmetic Java library. 
+- Investigate whether using memory-mapped files could be used effectively to store large matrices to reduce the GC overhead
+- Support custom thread pool management for improved multithreading control.
+- More unit & benchmark tests. May remove fork/join implementations if they don't provide performance benefits since it requires more thought for the user to select an appropriate threshold value, or alternatively auto-generate a threshold value, similarly to parallel stream methods.
 
 ---
 
@@ -110,16 +117,6 @@ For enhanced performance, `parallelDot` enables multithreaded computation:
 1. **Set Up the Project**:
     - Clone the repository and run gradle build to create a JAR
 
-
----
-
-## Future Improvements
-
-- Reduce latency of list calculations, e.g. set ArrayList capacity to prevent the underlying array from resizing
-- Improve GC performance, immutable classes like BigDecimal aren't great for GC.
-- Use distributed computing to use divide-and-conquer.
-- Support custom thread pool management for improved multithreading control.
-- More unit & benchmark tests. May remove fork/join implementations if they don't provide performance benefits since it requires more thought for the user to select an appropriate threshold value, or alternatively auto-generate a threshold value, similarly to parallel stream methods.
 
 ---
 
